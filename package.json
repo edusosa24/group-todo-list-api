@@ -1,0 +1,20 @@
+{
+  "name": "group_task_manager_api",
+  "version": "1.0.0",
+  "description": "Group task manager API",
+  "main": "server.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node server",
+    "dev": "nodemon server"
+  },
+  "author": "Eduardo Sosa",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "nodemon": "^2.0.18"
+  }
+}
