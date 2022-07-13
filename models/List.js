@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const User = require('./User');
 
 const ListSchema = new mongoose.Schema({
   name: {
@@ -8,50 +9,37 @@ const ListSchema = new mongoose.Schema({
     maxlength: [50, 'Name cannot be longer than 50 characters'],
   },
 
-  /*owner: {
-     type: Schema.Types.ObjectId, ref: 'User', require: true
-  },*/
-  /*members: [
-    { type: Schema.Types.ObjectId, ref: 'User' }
-  ],*/
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+
+  members: { type: [mongoose.Schema.Types.ObjectId], ref: 'User', default: [] },
 
   tasks: {
     type: [
       {
-        name: {
+        task: {
           type: String,
-          require: [true, 'Please add a name'],
-          maxlength: [50, 'Name cannot be longer than 50 characters'],
+          required: [true, 'Please add a task.'],
+          maxlength: [150, 'Task cannot be longer than 150 characters.'],
         },
-        desc: {
-          type: String,
-          maxlength: [100, 'Name cannot be longer than 100 characters'],
-        },
+
         state: {
           type: String,
-          required: true,
           enum: ['Pending', 'In Process', 'Completed'],
           default: 'Pending',
         },
-        /*takedBy: {
-          type: Schema.Types.ObjectId,
+
+        takedBy: {
+          type: mongoose.Schema.Types.ObjectId,
           ref: 'User',
-          default: ' ',        
-        },*/
-        createdAt: {
-          type: Date,
-          default: Date.now,
+          default: ' ',
         },
-        default: {},
       },
     ],
-    required: true,
     default: [],
-  },
-
-  createdAt: {
-    type: Date,
-    default: Date.now,
   },
 });
 
