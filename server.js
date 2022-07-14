@@ -15,6 +15,7 @@ connectDB();
 
 // Importing routes
 const lists = require('./routes/lists');
+const tasks = require('./routes/tasks');
 const auth = require('./routes/auth');
 
 const app = express();
@@ -32,6 +33,7 @@ if (process.env.NODE_ENV === 'development') {
 
 // Routes
 app.use('/api/v1/lists', lists);
+app.use('/api/v1/tasks', tasks);
 app.use('/api/v1/auth', auth);
 
 app.use(errorHandler);
