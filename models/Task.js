@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
 const User = require('./User');
+const User = require('./List');
 
 const TaskSchema = new mongoose.Schema({
   title: {
     type: String,
     required: [true, 'Please add a title.'],
+    minlength: [3, 'Name cannot be shorter than 3 characters'],
     maxlength: [30, 'Title cannot be longer than 30 characters.'],
   },
 
@@ -29,7 +31,13 @@ const TaskSchema = new mongoose.Schema({
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    default: ' ',
+    required: [true, 'Please add the creator ID.'],
+  },
+
+  fromList: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'List',
+    required: [true, 'Please add the list ID.'],
   },
 });
 

@@ -1,13 +1,14 @@
 const ErrorResponse = require('../utils/ErrorResponse');
 const asyncHandler = require('../middleware/async');
 const User = require('../models/User');
+const List = require('../models/List');
 const Task = require('../models/Task');
 
 // @desc    Gets a single task
 // @route   GET /api/v1/tasks/:id
 // @access  Private
 exports.getTask = asyncHandler(async (req, res, next) => {
-  const task = await Task.findById(req.params.id);
+  const task = await Task.findById(req.params.id).populate('takedBy');
 
   if (!task) {
     return next(
@@ -25,9 +26,18 @@ exports.getTask = asyncHandler(async (req, res, next) => {
 // @route   Post /api/v1/tasks
 // @access  Private
 exports.createTask = asyncHandler(async (req, res, next) => {
-  req.body.owner = req.user.id;
+  req.body.createdBy = req.user.id;
+
+  const list = await List.findById(req.body.fromList);
+  if (req.body.createdBy !== list.owner) {
+    return next(
+      new ErrorResponse('Only the list owner can create a task.', 403)
+    );
+  }
 
   const task = await Task.create(req.body);
+
+  updateListCreate(task.fromList, task.id);
 
   res.status(201).json({
     success: true,
@@ -35,10 +45,29 @@ exports.createTask = asyncHandler(async (req, res, next) => {
   });
 });
 
+const updateListCreate = async (listID, taskID) => {
+  const list = await List.findById(listID);
+
+  list.tasks.push(taskID);
+
+  list = await List.findByIdAndUpdate(listID, list.tasks, {
+    new: true,
+    runValidators: true,
+  });
+};
+
 // @desc    Updates task
 // @route   PUT /api/v1/tasks/:id
 // @access  Private
 exports.updateTask = asyncHandler(async (req, res, next) => {
+  const own = await Task.findById(req.params.id);
+
+  if (own.createdBy != req.user.id || own.takedBy != req.user.id) {
+    return next(
+      new ErrorResponse('Only the owner or assigned member can modify.', 403)
+    );
+  }
+
   let update = req.body;
 
   const task = await Task.findByIdAndUpdate(req.params.id, update, {
@@ -64,11 +93,11 @@ exports.updateTask = asyncHandler(async (req, res, next) => {
 exports.deleteTask = asyncHandler(async (req, res, next) => {
   const own = await Task.findById(req.params.id);
 
-  if (own.owner != req.user.id) {
+  if (own.createdBy != req.user.id) {
     return next(new ErrorResponse('Only the owner can delete.', 403));
   }
 
-  const task = await Task.findByIdAndDelete(req.params.id);
+  const task = await Task.findByIdAndRemove(req.params.id);
 
   if (!task) {
     return next(
@@ -76,8 +105,25 @@ exports.deleteTask = asyncHandler(async (req, res, next) => {
     );
   }
 
+  updateListDelete(task.fromList, task.id);
+
   res.status(200).json({
     success: true,
     data: {},
   });
 });
+
+const updateListDelete = async (listID, taskID) => {
+  const list = await List.findById(listID);
+
+  for (let i = 0; i < list.tasks.length; i++) {
+    if (list.tasks[i] === taskID) {
+      arr.splice(i, 1);
+    }
+  }
+
+  list = await List.findByIdAndUpdate(listID, list.tasks, {
+    new: true,
+    runValidators: true,
+  });
+};

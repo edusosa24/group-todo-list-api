@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/auth');
-
-// const {} = require('../controllers/tasks');
+const {} = require('../controllers/tasks');
 
 router.route('/').post(protect, createTask);
 
