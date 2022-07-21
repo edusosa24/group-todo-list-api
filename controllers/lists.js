@@ -66,9 +66,7 @@ exports.createList = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/lists/:id
 // @access  Private
 exports.updateList = asyncHandler(async (req, res, next) => {
-  let update = req.body;
-
-  const list = await List.findByIdAndUpdate(req.params.id, update, {
+  const list = await List.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
