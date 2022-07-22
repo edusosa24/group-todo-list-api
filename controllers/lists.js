@@ -1,26 +1,14 @@
 const ErrorResponse = require('../utils/ErrorResponse');
 const asyncHandler = require('../middleware/async');
 const List = require('../models/List');
+const Task = require('../models/Task');
 const User = require('../models/User');
-
-// @desc    Gets all lists
-// @route   GET /api/v1/lists
-// @access  Private
-exports.getLists = asyncHandler(async (req, res, next) => {
-  const lists = await List.find().select('name');
-
-  res.status(200).json({
-    success: true,
-    count: lists.length,
-    data: lists,
-  });
-});
 
 // @desc    Gets a single list
 // @route   GET /api/v1/lists/:id
 // @access  Private
 exports.getList = asyncHandler(async (req, res, next) => {
-  const list = await List.findById(req.params.id);
+  let list = await List.findById(req.params.id);
 
   if (!list) {
     return next(
@@ -28,7 +16,7 @@ exports.getList = asyncHandler(async (req, res, next) => {
     );
   }
 
-  handleNewMember(req.user.id, list);
+  list = await handleNewMember(req.user.id, list);
 
   res.status(200).json({
     success: true,
@@ -37,22 +25,31 @@ exports.getList = asyncHandler(async (req, res, next) => {
 });
 
 const handleNewMember = async (userID, list) => {
-  if (userID !== list.owner || !list.members.includes(userID)) {
-    let update = {};
-    list.members.push(userID);
-    update.members = list.members;
-    list = await List.findByIdAndUpdate(list.id, update, {
-      new: true,
-      runValidators: true,
-    });
+  console.log(`${userID} ${list.createdBy}`);
+
+  console.log(userID === list.createdBy);
+  if (!list.createdBy.equals(userID) && !list.members.includes(userID)) {
+    list = await List.findByIdAndUpdate(
+      list.id,
+      {
+        $push: {
+          members: userID,
+        },
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
   }
+  return list;
 };
 
 // @desc    Create new list
 // @route   Post /api/v1/lists
 // @access  Private
 exports.createList = asyncHandler(async (req, res, next) => {
-  req.body.owner = req.user.id;
+  req.body.createdBy = req.user.id;
 
   const list = await List.create(req.body);
 
@@ -87,19 +84,23 @@ exports.updateList = asyncHandler(async (req, res, next) => {
 // @route   DELETE /api/v1/lists/:id
 // @access  Private
 exports.deleteList = asyncHandler(async (req, res, next) => {
-  const own = await List.findById(req.params.id);
-
-  if (own.owner != req.user.id) {
-    return next(new ErrorResponse('Only the owner can delete.', 403));
-  }
-
-  const list = await List.findByIdAndDelete(req.params.id);
+  let list = await List.findById(req.params.id);
 
   if (!list) {
     return next(
       new ErrorResponse(`List not found with ID of ${req.params.id}`, 404)
     );
   }
+
+  if (list.createdBy != req.user.id) {
+    return next(new ErrorResponse('Only the list creator can delete it.', 403));
+  }
+
+  list.tasks.forEach(async (task) => {
+    let rm = await Task.findByIdAndRemove(task);
+  });
+
+  list = await List.findByIdAndRemove(req.params.id);
 
   res.status(200).json({
     success: true,

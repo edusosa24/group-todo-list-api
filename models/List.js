@@ -17,14 +17,18 @@ const ListSchema = new mongoose.Schema({
     maxlength: [300, 'Description cannot be longer than 300 characters.'],
   },
 
-  owner: {
+  createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
     immutable: true,
   },
 
-  members: { type: [mongoose.Schema.Types.ObjectId], ref: 'User', default: [] },
+  members: {
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'User',
+    default: [],
+  },
 
   tasks: {
     type: [mongoose.Schema.Types.ObjectId],

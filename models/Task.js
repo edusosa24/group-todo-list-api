@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('./User');
-const User = require('./List');
+const List = require('./List');
 
 const TaskSchema = new mongoose.Schema({
   title: {
@@ -20,12 +20,6 @@ const TaskSchema = new mongoose.Schema({
     type: String,
     enum: ['Pending', 'In Process', 'Completed'],
     default: 'Pending',
-  },
-
-  takedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    default: ' ',
   },
 
   createdBy: {

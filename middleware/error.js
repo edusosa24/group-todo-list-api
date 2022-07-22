@@ -9,7 +9,7 @@ const errorHandler = (err, req, res, next) => {
 
   // Invalid ID
   if (err.name === 'CastError') {
-    const message = `List not found with the ID of ${err.value}`;
+    const message = `Resource not found`;
     error = new ErrorResponse(message, 404);
   }
 
@@ -25,9 +25,10 @@ const errorHandler = (err, req, res, next) => {
     error = new ErrorResponse(message, 400);
   }
 
-  res
-    .status(error.statusCode || 500)
-    .json({ success: false, error: error.message || 'Server Error.' });
+  res.status(error.statusCode || 500).json({
+    success: false,
+    error: error.message || 'Server Error.',
+  });
 };
 
 module.exports = errorHandler;

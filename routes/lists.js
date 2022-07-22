@@ -3,14 +3,13 @@ const router = express.Router();
 const { protect } = require('../middleware/auth');
 
 const {
-  getLists,
   getList,
   createList,
   updateList,
   deleteList,
 } = require('../controllers/lists');
 
-router.route('/').get(protect, getLists).post(protect, createList);
+router.route('/').post(protect, createList);
 
 router
   .route('/:id')
