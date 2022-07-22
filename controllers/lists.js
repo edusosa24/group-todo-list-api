@@ -8,7 +8,7 @@ const User = require('../models/User');
 // @route   GET /api/v1/lists/:id
 // @access  Private
 exports.getList = asyncHandler(async (req, res, next) => {
-  let list = await List.findById(req.params.id);
+  let list = await List.findById(req.params.id).populate('tasks');
 
   if (!list) {
     return next(
