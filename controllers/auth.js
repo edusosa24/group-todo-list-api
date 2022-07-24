@@ -76,7 +76,7 @@ exports.getMe = asyncHandler(async (req, res, next) => {
     success: true,
     data: {
       user_info: user,
-      owned_lists: userCreatedLists,
+      created_lists: userCreatedLists,
       member_lists: userMemberLists,
     },
   });

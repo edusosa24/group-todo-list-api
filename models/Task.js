@@ -3,17 +3,10 @@ const User = require('./User');
 const List = require('./List');
 
 const TaskSchema = new mongoose.Schema({
-  title: {
+  todo: {
     type: String,
-    required: [true, 'Please add a title.'],
-    minlength: [3, 'Name cannot be shorter than 3 characters'],
-    maxlength: [30, 'Title cannot be longer than 30 characters.'],
-  },
-
-  description: {
-    type: String,
-    required: [true, 'Please add a description.'],
-    maxlength: [300, 'Description cannot be longer than 300 characters.'],
+    required: [true, 'Please add a todo.'],
+    maxlength: [150, 'Todo cannot be longer than 150 characters.'],
   },
 
   state: {

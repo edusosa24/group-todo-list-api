@@ -26,6 +26,8 @@ exports.getTask = asyncHandler(async (req, res, next) => {
 // @route   Post /api/v1/tasks
 // @access  Private
 exports.createTask = asyncHandler(async (req, res, next) => {
+  req.body.createdBy = req.user.id;
+
   const task = await Task.create(req.body);
 
   updateListCreate(task.fromList, task.id);
