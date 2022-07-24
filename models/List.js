@@ -13,6 +13,7 @@ const ListSchema = new mongoose.Schema({
   description: {
     type: String,
     required: [true, 'Please add a description.'],
+    minlength: [10, 'Description cannot be shorter than 10 characters.'],
     maxlength: [300, 'Description cannot be longer than 300 characters.'],
   },
 

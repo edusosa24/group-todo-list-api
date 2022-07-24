@@ -6,6 +6,7 @@ const TaskSchema = new mongoose.Schema({
   todo: {
     type: String,
     required: [true, 'Please add a todo.'],
+    minlength: [10, 'Todo cannot be shorter than 10 characters.'],
     maxlength: [150, 'Todo cannot be longer than 150 characters.'],
   },
 
